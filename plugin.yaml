@@ -1,0 +1,65 @@
+name: storj
+label: Storj Storage
+version: "0.1.0"
+manifest_version: 2
+api_version: 1
+description: >
+  Manage files on Storj decentralized cloud storage — list buckets, list/stat/delete
+  objects, upload, download, and share files via capability-based access grants.
+  Powered by ctypes bindings to the native uplink-c library.
+author: austpryb
+license: MIT
+homepage: https://github.com/austpryb/hermes-plugin-storj
+tags: [storage, storj, files, decentralized, s3]
+
+provides_tools:
+  - storj_list_buckets
+  - storj_create_bucket
+  - storj_delete_bucket
+  - storj_list_objects
+  - storj_stat_object
+  - storj_delete_object
+  - storj_upload
+  - storj_download
+  - storj_share
+  - storj_receive
+
+provides_hooks:
+  - pre_tool_call
+
+# Deliberately optional rather than `requires_env`: a missing `requires_env` var
+# disables the whole plugin, and the access grant may instead live in
+# plugins.entries.storj.settings.access_grant. Availability is decided per tool
+# by check_fn (grant present AND libuplink loadable).
+optional_env:
+  - name: STORJ_ACCESS_GRANT
+    description: "Serialized Storj access grant (satellite UI or `uplink share`). Alternative to the access_grant setting."
+    prompt: "Storj access grant"
+    url: "https://storj.io"
+    secret: true
+  - name: STORJ_LIBUPLINK_PATH
+    description: "Absolute path to libuplink.so/.dylib/.dll. Defaults to the plugin's native/ directory, then the system library path."
+    prompt: "Path to libuplink (or empty)"
+    secret: false
+
+config_schema:
+  access_grant:
+    type: str
+    default: ""
+    description: "Serialized Storj access grant. Falls back to the STORJ_ACCESS_GRANT env var."
+    required: false
+  libuplink_path:
+    type: str
+    default: ""
+    description: "Absolute path to the libuplink shared library. Falls back to STORJ_LIBUPLINK_PATH, then native/, then the system loader."
+    required: false
+  confirm_destructive:
+    type: bool
+    default: true
+    description: "Route write/delete/share tools through the human approval gate (the Hermes equivalent of OpenClaw's ownerOnly)."
+    required: false
+  max_download_bytes:
+    type: int
+    default: 268435456
+    description: "Refuse downloads larger than this many bytes (default 256 MiB)."
+    required: false
