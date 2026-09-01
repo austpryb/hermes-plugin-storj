@@ -21,6 +21,15 @@ This is the Hermes port of [`openclaw-plugin-storj`](https://github.com/austpryb
 hermes plugins install austpryb/hermes-plugin-storj --enable
 ```
 
+Or, to develop against a local checkout, symlink it into your plugin directory
+and enable it:
+
+```bash
+mkdir -p ~/.hermes/plugins
+ln -s "$PWD" ~/.hermes/plugins/storj
+hermes plugins enable storj
+```
+
 Then configure the access grant — either as a plugin setting:
 
 ```bash
@@ -108,6 +117,17 @@ hermes-plugin-storj/
 ├── uplink.py        # ctypes bindings to uplink-c
 └── native/          # drop libuplink.so / .dylib / .dll here
 ```
+
+## Releasing
+
+1. Update `CHANGELOG.md` and the `version` in `plugin.yaml`.
+2. Push to `main` and let CI go green.
+3. `./scripts/index-entry.sh` prints the entry for the
+   [community plugin index](https://github.com/NousResearch/hermes-plugin-index),
+   pinned to the current commit. Submit it as a pull request there — after which
+   `hermes plugins install hermes-plugin-storj` resolves by bare name.
+
+Index review covers entry metadata only; it is not a code audit.
 
 ## License
 
